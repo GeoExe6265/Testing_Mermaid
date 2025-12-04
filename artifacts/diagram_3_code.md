@@ -36,5 +36,5 @@ classDiagram
     Manager "1" --> "*" Employee: manages
     Director "1" --> "*" Manager: oversees
     
-    Note: "Author: GeoExe\nИерархия управления\nперсоналом компании"
+    Note "Author: GeoExe\nИерархия управления\nперсоналом компании"
 ```
