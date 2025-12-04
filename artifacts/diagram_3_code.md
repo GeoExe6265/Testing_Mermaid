@@ -16,7 +16,6 @@ classDiagram
     
     class Manager {
         #teamSize: int
-        #team: List~Employee~
         +getBonus() float
         +addEmployee(emp: Employee)
         +removeEmployee(empId: string)
@@ -24,17 +23,15 @@ classDiagram
     }
     
     class Director {
-        #divisions: List~Manager~
+        #bonus: float
         +getBonus() float
         +addDivision(manager: Manager)
         +getCompanySalary() float
     }
     
-    Person <|-- Employee
-    Person <|-- Manager
-    Person <|-- Director
-    Manager "1" --> "*" Employee: manages
-    Director "1" --> "*" Manager: oversees
-    
-    note for Person "Author: GeoExe</br>Иерархия управления</br>персоналом компании"
+    Person <|-- Employee: наследование
+    Person <|-- Manager: наследование
+    Person <|-- Director: наследование
+    Manager "1" --> "*" Employee: управляет
+    Director "1" --> "*" Manager: управляет
 ```
