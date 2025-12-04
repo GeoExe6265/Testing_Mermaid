@@ -24,7 +24,7 @@ gantt
     API Endpoints          :be3, after be2, 7d
     
     section QA
-    Integration Tests      :qa1, after fe3, after be3, 5d
+    Integration Tests      :qa1, after fe3, 5d
     Performance Testing    :qa2, after qa1, 5d
     
     section Deployment
