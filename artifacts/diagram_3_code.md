@@ -1,3 +1,4 @@
+```mermaid
 classDiagram
     class Person {
         #name: string
@@ -36,3 +37,4 @@ classDiagram
     Director "1" --> "*" Manager: oversees
     
     note for Person "Author: GeoExe\nИерархия управления\nперсоналом компании"
+```
