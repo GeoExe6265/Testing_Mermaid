@@ -1,0 +1,126 @@
+name: Check Mermaid Assignment
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+jobs:
+  validate-assignment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Check README.md exists
+        run: |
+          if [ ! -f "README.md" ]; then
+            echo "❌ Ошибка: README.md не найден!"
+            exit 1
+          fi
+
+          if [ ! -s "README.md" ]; then
+            echo "❌ Ошибка: README.md пустой!"
+            exit 1
+          fi
+
+          echo "✅ README.md найден и заполнен"
+      - name: Check image count in README.md
+        run: >
+          IMAGE_COUNT=$(grep -o '!\[.*\](./artifacts/.*\.png)' README.md | wc
+          -l)
+
+
+          if [ "$IMAGE_COUNT" -lt 5 ]; then
+            echo "❌ Ошибка: В README.md найдено только $IMAGE_COUNT изображений, нужно 5"
+            echo "   Ожидается формат: ![Description](./artifacts/diagram_X.png)"
+            exit 1
+          fi
+
+
+          if [ "$IMAGE_COUNT" -gt 5 ]; then
+            echo "⚠️  Внимание: В README.md найдено $IMAGE_COUNT изображений, ожидалось 5"
+          fi
+
+
+          echo "✅ README.md содержит $IMAGE_COUNT ссылок на изображения"
+      - name: Check artifacts folder exists
+        run: |
+          if [ ! -d "artifacts" ]; then
+            echo "❌ Ошибка: Папка 'artifacts' не найдена!"
+            exit 1
+          fi
+
+          echo "✅ Папка artifacts существует"
+      - name: Check image files count in artifacts
+        run: >
+          IMAGE_COUNT=$(find artifacts -type f \( -name "*.png" -o -name "*.jpg"
+          -o -name "*.jpeg" \) | wc -l)
+
+
+          if [ "$IMAGE_COUNT" -ne 5 ]; then
+            echo "❌ Ошибка: В папке artifacts найдено $IMAGE_COUNT изображений, нужно ровно 5"
+            echo "   Найденные файлы:"
+            find artifacts -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) | sed 's/^/   /'
+            exit 1
+          fi
+
+
+          echo "✅ В папке artifacts найдено 5 изображений:"
+
+          find artifacts -type f \( -name "*.png" -o -name "*.jpg" -o -name
+          "*.jpeg" \) | sed 's/^/   /'
+      - name: Check markdown files count in artifacts
+        run: >
+          MD_COUNT=$(find artifacts -type f -name "*.md" | wc -l)
+
+
+          if [ "$MD_COUNT" -ne 10 ]; then
+            echo "❌ Ошибка: В папке artifacts найдено $MD_COUNT MD-файлов, нужно ровно 10"
+            echo "   Ожидается: 5 диаграмм × 2 файла (chat.md + code.md) = 10 файлов"
+            echo "   Найденные файлы:"
+            find artifacts -type f -name "*.md" | sed 's/^/   /'
+            exit 1
+          fi
+
+
+          echo "✅ В папке artifacts найдено 10 MD-файлов:"
+
+          find artifacts -type f -name "*.md" | sed 's/^/   /'
+      - name: Validate file naming convention
+        run: |
+          echo "🔍 Проверка структуры файлов..."
+
+          # Проверяем наличие файлов типа diagram_X_chat.md и diagram_X_code.md
+          CHAT_COUNT=$(find artifacts -type f -name "*_chat.md" | wc -l)
+          CODE_COUNT=$(find artifacts -type f -name "*_code.md" | wc -l)
+
+          if [ "$CHAT_COUNT" -lt 5 ] || [ "$CODE_COUNT" -lt 5 ]; then
+            echo "⚠️  Внимание: Рекомендуется назвать файлы по паттерну:"
+            echo "   - diagram_1_chat.md, diagram_1_code.md"
+            echo "   - diagram_2_chat.md, diagram_2_code.md"
+            echo "   и т.д."
+            echo "   Найдено chat файлов: $CHAT_COUNT, code файлов: $CODE_COUNT"
+          else
+            echo "✅ Файлы названы по рекомендуемому паттерну"
+          fi
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "📋 Проверены:"
+          echo "  ✓ README.md заполнен"
+          echo "  ✓ 5 ссылок на изображения в README.md"
+          echo "  ✓ Папка artifacts существует"
+          echo "  ✓ 5 изображений в artifacts"
+          echo "  ✓ 10 MD-файлов в artifacts"
+          echo ""
+          echo "Готово к отправке на проверку! 🚀"
